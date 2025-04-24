@@ -1,3 +1,4 @@
+import cors from "cors"
 import dotenv from "dotenv";
 import morgan from "morgan";
 import express from "express";
@@ -7,8 +8,8 @@ dotenv.config();
 import connectDB from "./config/db.js";
 
 import { router } from "./route/indexRoute.js";
+import { corsOptions } from "./config/cors.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
-import chalk from "chalk";
 
 const port = process.env.PORT || 5000;
 
@@ -17,6 +18,7 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors(corsOptions))
 app.use(cookieParser());
 app.use(morgan('dev'));
 
