@@ -3,9 +3,6 @@ import expressAsyncHandler from "express-async-handler";
 import User from "../model/userModel.js";
 import generateToken from "../utils/generateToken.js";
 
-export const userTest = (req, res) => {
-  res.status(200).send("hhhhhh");
-};
 
 export const userSignup = expressAsyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -44,7 +41,6 @@ export const userSignup = expressAsyncHandler(async (req, res) => {
   }
 });
 
-
 export const userSignin = expressAsyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
@@ -70,8 +66,13 @@ export const userSignout = (req, res) => {
   res.status(200).json({ message: 'Logged out successfully' });
 };
 
-
 export const getUser = expressAsyncHandler(async (req, res) => {
-  const users = await User.find({});
-  res.json(users);
+  const user = req.user;
+  res.status(200).json({
+    success: true,
+    message: "Authenticated user!",
+    user,
+  });
 });
+
+
