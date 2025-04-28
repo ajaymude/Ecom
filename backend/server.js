@@ -1,34 +1,61 @@
-import cors from "cors"
-import dotenv from "dotenv";
-import morgan from "morgan";
-import express from "express";
-import cookieParser from "cookie-parser";
-dotenv.config();
+const express = require("express");
+const mongoose = require("mongoose");
+const morgan = require("morgan");
+const cookieParser = require("cookie-parser");
+const cors = require("cors");
+const authRouter = require("./routes/auth/auth-routes");
+const adminProductsRouter = require("./routes/admin/products-routes");
+const adminOrderRouter = require("./routes/admin/order-routes");
 
-import connectDB from "./config/db.js";
+const shopProductsRouter = require("./routes/shop/products-routes");
+const shopCartRouter = require("./routes/shop/cart-routes");
+const shopAddressRouter = require("./routes/shop/address-routes");
+// const shopOrderRouter = require("./routes/shop/order-routes");
+const shopSearchRouter = require("./routes/shop/search-routes");
+const shopReviewRouter = require("./routes/shop/review-routes");
 
-import { router } from "./route/indexRoute.js";
-import { corsOptions } from "./config/cors.js";
-import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
+const commonFeatureRouter = require("./routes/common/feature-routes");
 
-const port = process.env.PORT || 5000;
+//create a database connection -> u can also
+//create a separate file for this and then import/use that file here
 
-connectDB();
+mongoose
+  .connect("mongodb://localhost:27017/ecom12qw")
+  .then(() => console.log("MongoDB connected"))
+  .catch((error) => console.log(error));
+
 const app = express();
+const PORT = process.env.PORT || 5000;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cors(corsOptions))
-app.use(cookieParser());
-app.use(morgan('dev'));
-
-
-
-app.use(router);
-
-app.use(notFound);
-app.use(errorHandler);
-
-app.listen(port, () =>
-  console.log(`Server running in ${process.env.NODE_ENV} mode on port ${port}`)
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "DELETE", "PUT"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Cache-Control",
+      "Expires",
+      "Pragma",
+    ],
+    credentials: true,
+  })
 );
+
+app.use(cookieParser());
+app.use(express.json());
+app.use(morgan("dev"));
+app.use("/api/auth", authRouter);
+app.use("/api/admin/products", adminProductsRouter);
+app.use("/api/admin/orders", adminOrderRouter);
+
+app.use("/api/shop/products", shopProductsRouter);
+app.use("/api/shop/cart", shopCartRouter);
+app.use("/api/shop/address", shopAddressRouter);
+// app.use("/api/shop/order", shopOrderRouter);
+app.use("/api/shop/search", shopSearchRouter);
+app.use("/api/shop/review", shopReviewRouter);
+
+app.use("/api/common/feature", commonFeatureRouter);
+
+app.listen(PORT, () => console.log(`Server is now running on port ${PORT}`));
